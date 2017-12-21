@@ -2,11 +2,14 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 const fs = require('fs-extra')
-
+const session = require('express-session')
 const bodyParser = require('body-parser')
 app.use(bodyParser.raw({ type: '*/*' }))
 app.use(cors())
 let todos = {}
+
+app.use(session({secret: 'keyboard cat'}))
+
 
 function loadTodos() {
     fs.ensureFile('todos.json')
@@ -18,7 +21,6 @@ function loadTodos() {
                 todos = {};
             }
             else {
-                console.log(raw.toString());
                 todos = JSON.parse(raw);
             }
         })
@@ -38,9 +40,9 @@ app.get('/todos', (req, res) => {
 })
 
 app.post('/addTodo', (req, res) => {
+    let username = req.session.username; 
     let payload = JSON.parse(req.body.toString());
     let item = payload.item;
-    let username = payload.username;
     let userTodos = todos[username]
     if (userTodos == undefined) userTodos = []
     userTodos.push(item);
@@ -55,6 +57,7 @@ app.post('/login', (req, res) => {
     let username = payload.username;
     let password = payload.password;
     if (username === "bob" && password === "bob123") {
+        req.session.username = username;
         res.send("ok")
     }
     else {
@@ -63,8 +66,7 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/clearTodos', (req, res) => {
-    let payload = JSON.parse(req.body.toString());
-    let username = payload.username;
+    let username = req.session.username;
     todos[username] = [];
     saveTodos()
         .then(() => res.send("ok"))
