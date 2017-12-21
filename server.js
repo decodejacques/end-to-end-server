@@ -36,7 +36,7 @@ app.get('/todos', (req, res) => {
     if (userTodos == undefined) userTodos = []
     res.send(JSON.stringify(userTodos))
 })
-// hey
+
 app.post('/addTodo', (req, res) => {
     let payload = JSON.parse(req.body.toString());
     let item = payload.item;
