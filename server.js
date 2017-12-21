@@ -10,7 +10,7 @@ let todos = {}
 
 function loadTodos() {
     fs.ensureFile('todos.json')
-        .then(() => 
+        .then(() =>
             fs.readFile('todos.json')
         )
         .then(raw => {
@@ -48,6 +48,18 @@ app.post('/addTodo', (req, res) => {
     console.log(userTodos);
     saveTodos()
         .then(() => res.send("ok"))
+})
+
+app.post('/login', (req, res) => {
+    let payload = JSON.parse(req.body.toString());
+    let username = payload.username;
+    let password = payload.password;
+    if (username === "bob" && password === "bob123") {
+        res.send("ok")
+    }
+    else {
+        res.send("login failed")
+    }
 })
 
 app.post('/clearTodos', (req, res) => {
